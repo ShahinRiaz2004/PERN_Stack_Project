@@ -1,38 +1,47 @@
-import React, {Fragment, useState} from "react";
 
-const InputTodo = () => {
+import React, { useState } from 'react';
+import { Container, Form, InputGroup, Button, Card } from 'react-bootstrap';
+import { PlusCircle } from 'react-bootstrap-icons';
 
-    const [description, setDescription ] = useState(" ");
+const InputTodo = ({ onAdd }) => {
+  const [description, setDescription] = useState('');
 
-  const   onSubmitForm = async(e) => {
+  const onSubmitForm = async (e) => {
+    e.preventDefault();
     try {
-        e.preventDefault(); 
-        const body = { description };
-        const response = await fetch("http://localhost:5000/todos", {
-            method: "POST",
-            headers:{ "Content-type": "application/json"},
-            body: JSON.stringify(body)
-        })
-
-        window.location = "/";
+      const body = { description };
+      const response = await fetch('http://localhost:5000/todos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const newTodo = await response.json();
+      onAdd(newTodo);
+      setDescription('');
     } catch (err) {
-        console.error(err.message);
+      console.error(err.message);
     }
-  }
-    return (
-        <Fragment>
-            <h2 className="text-center mg-5">PERN Todo List</h2>
-            
-            <form className="d-flex mt-5 " onSubmit={onSubmitForm}>
-                <input type="text" className="form-control" value={description} 
-                 onChange={e => setDescription(e.target.value)}
-                /> 
-                <button className="btn btn-success">Add</button>
-            </form>
-        </Fragment>
-    )
-}
+  };
 
-
+  return (
+    <Container className="mt-5">
+      <Card className="p-4 shadow-sm">
+        <Form onSubmit={onSubmitForm} className="d-flex align-items-center">
+          <InputGroup>
+            <Form.Control
+              placeholder="What do you need to do?"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
+            <Button type="submit" variant="success">
+              <PlusCircle /> Add Todo
+            </Button>
+          </InputGroup>
+        </Form>
+      </Card>
+    </Container>
+  );
+};
 
 export default InputTodo;
